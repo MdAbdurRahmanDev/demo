@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "GuardPro - Security Company Management System",
+  title: "GuardProo - Security Company Management System",
   description: "Enterprise SaaS Security Guard & Operations Management System for Bangladesh",
 };
 
