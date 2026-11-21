@@ -19,8 +19,8 @@ import {
   Package,
   BarChart3,
   Settings,
-  ChevronRight,
   LogOut,
+  X,
 } from "lucide-react";
 
 interface NavItem {
@@ -48,57 +48,82 @@ const navItems: NavItem[] = [
   { title: "Settings", href: "/settings", icon: Settings },
 ];
 
-export default function Sidebar({ collapsed = false }: { collapsed?: boolean }) {
+interface SidebarProps {
+  mobileOpen?: boolean;
+  onMobileClose?: () => void;
+}
+
+export default function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
   const pathname = usePathname();
 
   return (
-    <aside
-      className={`fixed top-0 left-0 z-40 h-screen transition-all duration-200 bg-white border-r border-slate-200 flex flex-col justify-between ${
-        collapsed ? "w-20" : "w-64"
-      }`}
-    >
-      <div>
-        {/* Brand Header */}
-        <div className="h-16 flex items-center px-4 border-b border-slate-200 gap-3">
-          <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-sm flex-shrink-0">
-            <Shield className="w-6 h-6" />
-          </div>
-          {!collapsed && (
-            <div className="overflow-hidden">
-              <div className="flex items-center gap-1.5">
-                <span className="font-bold text-lg tracking-tight text-slate-900">GuardPro</span>
-                <span className="text-[10px] font-semibold uppercase tracking-wider bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded border border-blue-200">
-                  BD SaaS
-                </span>
+    <>
+      {/* Mobile Backdrop Overlay */}
+      {mobileOpen && (
+        <div
+          onClick={onMobileClose}
+          className="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-xs md:hidden transition-opacity"
+        />
+      )}
+
+      {/* Sidebar Panel */}
+      <aside
+        className={`fixed top-0 left-0 z-50 h-screen w-64 bg-white border-r border-slate-200 flex flex-col justify-between transition-transform duration-300 ease-in-out md:translate-x-0 ${
+          mobileOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full md:translate-x-0"
+        }`}
+      >
+        <div>
+          {/* Brand Header */}
+          <div className="h-16 flex items-center justify-between px-4 border-b border-slate-200">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-sm flex-shrink-0">
+                <Shield className="w-6 h-6" />
               </div>
-              <p className="text-xs text-slate-500 truncate">Security Management</p>
+              <div className="overflow-hidden">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-bold text-lg tracking-tight text-slate-900">GuardPro</span>
+                  <span className="text-[10px] font-semibold uppercase tracking-wider bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded border border-blue-200">
+                    BD SaaS
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 truncate">Security Management</p>
+              </div>
             </div>
-          )}
-        </div>
 
-        {/* Navigation Items */}
-        <div className="py-3 px-3 overflow-y-auto max-h-[calc(100vh-140px)] space-y-1">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href;
-            const Icon = item.icon;
+            {/* Mobile Close Button */}
+            <button
+              onClick={onMobileClose}
+              className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg md:hidden"
+              aria-label="Close menu"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
 
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors group relative ${
-                  isActive
-                    ? "bg-blue-50 text-blue-700 font-semibold border-l-4 border-blue-600"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                }`}
-                title={collapsed ? item.title : undefined}
-              >
-                <Icon
-                  className={`w-5 h-5 flex-shrink-0 ${
-                    isActive ? "text-blue-600" : "text-slate-400 group-hover:text-slate-600"
+          {/* Navigation Items */}
+          <div className="py-3 px-3 overflow-y-auto max-h-[calc(100vh-140px)] space-y-1">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href;
+              const Icon = item.icon;
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => {
+                    if (onMobileClose) onMobileClose();
+                  }}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors group relative ${
+                    isActive
+                      ? "bg-blue-50 text-blue-700 font-semibold border-l-4 border-blue-600"
+                      : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                   }`}
-                />
-                {!collapsed && (
+                >
+                  <Icon
+                    className={`w-5 h-5 flex-shrink-0 ${
+                      isActive ? "text-blue-600" : "text-slate-400 group-hover:text-slate-600"
+                    }`}
+                  />
                   <div className="flex items-center justify-between flex-1 truncate">
                     <span className="truncate">{item.title}</span>
                     {item.badge && (
@@ -111,34 +136,32 @@ export default function Sidebar({ collapsed = false }: { collapsed?: boolean }) 
                       </span>
                     )}
                   </div>
-                )}
-              </Link>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Footer / User Profile summary */}
-      <div className="p-3 border-t border-slate-200 bg-slate-50">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
-            HQ
+                </Link>
+              );
+            })}
           </div>
-          {!collapsed && (
+        </div>
+
+        {/* Footer / User Profile summary */}
+        <div className="p-3 border-t border-slate-200 bg-slate-50">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
+              HQ
+            </div>
             <div className="truncate flex-1">
               <p className="text-xs font-semibold text-slate-900 truncate">Dhaka Head Office</p>
               <p className="text-[11px] text-emerald-600 font-medium">● System Online</p>
             </div>
-          )}
-          <Link
-            href="/login"
-            className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-200 rounded-md transition-colors"
-            title="Switch User / Logout"
-          >
-            <LogOut className="w-4 h-4" />
-          </Link>
+            <Link
+              href="/login"
+              className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-200 rounded-md transition-colors"
+              title="Switch User / Logout"
+            >
+              <LogOut className="w-4 h-4" />
+            </Link>
+          </div>
         </div>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 }

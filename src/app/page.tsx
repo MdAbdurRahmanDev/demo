@@ -151,7 +151,7 @@ export default function DashboardPage() {
         </div>
 
         {/* 10 Enterprise KPI Cards Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
           {/* Total Employees */}
           <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:border-blue-300 transition group">
             <div className="flex items-center justify-between">
